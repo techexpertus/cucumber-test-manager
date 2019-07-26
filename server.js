@@ -124,13 +124,17 @@ app.put('/run', async (req, res) => {
             if (!await scenarioExistsInfeature(feature, scenario)) {
                 await pushScenario(feature, scenario)
                 // results.push({InsertedScenario: scenario.name})
-                return {InsertedScenario: scenario.name}
+                return {
+                    InsertedScenario: {feature: feature.name, scenario:scenario.name}
+                }
             } else {
                 await updateScenario(feature, scenario)
                 results.push({UpdatedScenario: scenario.name})
-                return {UpdatedScenario: scenario.name}
+                return {
+                    UpdatedScenario: {feature: feature.name, scenario: scenario.name}
+                }
             }
-            return {scenarioExists:scenario.name}
+            return {scenarioExists: scenario.name}
         })
     })
     const promisesForScenarios = flatten(scenarioInserts)
