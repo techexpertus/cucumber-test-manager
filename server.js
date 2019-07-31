@@ -80,13 +80,15 @@ scenarioExistsInfeature = async (feature, scenario) => {
 pushScenario = async (feature, scenario) => {
     let data = await db.collection(resultCollection).update(
         {
-            elements: {$elemMatch: {name: scenario.name}},
+            // elements: {$elemMatch: {name: scenario.name}},
             name: feature.name
             // uri: feature.uri
         },
         {$push: {elements: scenario}}
     )
+    console.log(data)
     return data
+
 }
 
 updateScenario = async (feature, scenario) => {
