@@ -86,7 +86,6 @@ pushScenario = async (feature, scenario) => {
         },
         {$push: {elements: scenario}}
     )
-    console.log(data)
     return data
 
 }
@@ -158,7 +157,7 @@ featureExists = async (feature) => {
 
 async function generateReport() {
     let results = await db.collection(resultCollection).find({}).toArray()
-    console.log(results)
+    // console.log(results)
     fs.writeFileSync('./json-files/cucumber.json', JSON.stringify(results));
     report.generate()
     return results
