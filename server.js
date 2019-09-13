@@ -112,9 +112,14 @@ app.put('/run', async (req, res) => {
     let results = []
     let promises = features.map(async feature => {
         if (!await featureExists(feature)) {
-            await insertFeature(feature)
-            // results.push({InsertedFeature: feature.name})
-            return {InsertedFeature: feature.name}
+            try{
+                await insertFeature(feature)
+                // results.push({InsertedFeature: feature.name})
+                return {InsertedFeature: feature.name}
+            }catch(error){
+                console.error(error)
+                return {InsertedFeature: `${feature.name} failed to insert`}
+            }
         }
         return {featureExists: feature.name}
     })
@@ -164,7 +169,42 @@ async function generateReport() {
 
 }
 
+function scenarioIsFailed(scenario) {
+    const failedSteps = scenario.steps.filter(step =>{
+        return step.result.status !== 'passed'
+    })
+    return failedSteps.length > 0
+}
+
+getFailedScenario = async()=>{
+    let data = await db.collection(resultCollection).find({
+        "elements.steps":{"$elemMatch":{"result.status":{$ne:"passed"}}}
+    },{
+        "elements.$":1
+
+    }).toArray()
+    // let data = await db.collection(resultCollection).find({}).toArray()
+
+    console.log(data)
+    let failedScenarios =[]
+    data.forEach(feature =>{
+        const failedFeatureScenarios = feature.elements.filter(scenario =>{
+            return scenarioIsFailed(scenario)
+        });
+        if(failedFeatureScenarios.length !==0){
+            failedScenarios = failedScenarios.concat(failedFeatureScenarios)
+        }
+    });
+
+     return failedScenarios.map(scenario => scenario.name)
+};
+
 app.post('/generate-report-json', async (req, res) => {
     let results = await generateReport(res);
     res.json(results.length)
+})
+
+app.get('/failed-scenarios', async (req, res) => {
+    let results = await getFailedScenario();
+    res.json(results)
 })
