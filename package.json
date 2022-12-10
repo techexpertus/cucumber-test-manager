@@ -15,7 +15,7 @@
     "@babel/preset-env": "7.5.5",
     "body-parser": "^1.14.2",
     "ejs": "^2.3.4",
-    "express": "^4.13.3",
+    "express": "^4.17.3",
     "mongodb": "3.2.7"
   },
   "devDependencies": {
